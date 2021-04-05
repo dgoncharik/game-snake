@@ -1,0 +1,27 @@
+.App {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.field {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: green;
+    border: 10px solid black;
+    border-radius: 10px;
+
+    .cell {
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, .2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 3px;
+
+        img {
+            max-width: 32px;
+        }
+    }
+}
