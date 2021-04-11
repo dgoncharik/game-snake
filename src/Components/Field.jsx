@@ -9,10 +9,7 @@ const DIRECTION = {
   DOWN: "DOWN",
 }
 
-
-
 const generateCells = ((numberRows, numberColumns) => {
-  console.log("generate Cells")
   const cells = [];
 
   for (let row=1; row < numberRows + 1; row++) {
@@ -27,22 +24,26 @@ const generateCells = ((numberRows, numberColumns) => {
 function Field({width, height, cellArea}) {
   const numberRows = Math.floor(height / cellArea);
   const numberColumns = Math.floor(width / cellArea);
-
-  const getRandomCell = () => ({...cells[getRandomInt(0, cells.length)]});
-
   const [cells, setCells] = React.useState(_ => generateCells(numberRows, numberColumns)); // [{row:1, col:1}, {row:1, col:2}...]
-  const [direction, setDirection] = React.useState(DIRECTION.RIGHT);
   const [snake, setSnake] = React.useState([{row:1, col:2}, {row:1, col:1}]);
-  const [food, setFood] = React.useState(getRandomCell);
+
+  const getRandomCellWithoutSnake = () => {
+    const allowedCells = cells.filter(cell => !snake.find( snakeCell => cell.row === snakeCell.row && cell.col === snakeCell.col));
+    return allowedCells[getRandomInt(0, allowedCells.length)];
+  }
+
+  const [direction, setDirection] = React.useState(DIRECTION.RIGHT);
+  const [food, setFood] = React.useState(getRandomCellWithoutSnake);
   const [step, setStep] = React.useState(0);
 
   const refDirection = React.useRef(direction);
   refDirection.current = direction;
 
-  const refInterval = React.useRef(null);
+  const refInterval = React.useRef({id:null, speed:220});
 
   const onKeyDown = (evt) => {
     const controlButtonPressed = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].some(key => key === evt.code);
+    console.log(evt.code)
     if (controlButtonPressed) {
       evt.preventDefault();
 
@@ -93,14 +94,18 @@ function Field({width, height, cellArea}) {
     setStep(step => step+1);
   }
 
+  const gameOver = () => {
+    clearInterval(refInterval.current.id);
+  }
+
   React.useEffect(() => {
 
     window.addEventListener("keydown", onKeyDown);
-    refInterval.current = setInterval(snakeStep, 300);
+    refInterval.current.id = setInterval(snakeStep, refInterval.current.speed);
 
     return () => {
-      clearInterval(refInterval.current);
       window.removeEventListener("keydown", onKeyDown);
+      gameOver();
     }
 
   }, [])
@@ -116,13 +121,13 @@ function Field({width, height, cellArea}) {
     const snakeIsOutRows    = snakeHead.row < 1 || snakeHead.row > numberRows;
 
     if (tailCollision) {
-      clearInterval(refInterval.current);
-      alert("Столкновение с хвостом")
+      gameOver();
+      alert("Столкновение с хвостом");
     }
 
     if (snakeAteFood) {
       setSnake(snake => [...snake, {row:snakeHead.row, col:snakeHead.col}])
-      setFood(getRandomCell());
+      setFood(getRandomCellWithoutSnake());
     }
 
     if (snakeIsOutColumns || snakeIsOutRows) {
