@@ -9,6 +9,7 @@
 .field {
     display: flex;
     flex-wrap: wrap;
+    flex-shrink: 0;
     background-color: green;
     border: 10px solid black;
     border-radius: 10px;
@@ -18,10 +19,20 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 3px;
+        //border-radius: 3px;
 
         img {
-            max-width: 32px;
+            max-width: 100%;
         }
+
+        &.snake {
+            background-color: cornflowerblue;
+        }
+
+        &.snakeHead {
+            background-color: darkred;
+            border-radius: 5px;
+        }
+
     }
 }
