@@ -21,11 +21,11 @@ const generateCells = ((numberRows, numberColumns) => {
 })
 
 
-function Field({width, height, cellArea}) {
+function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
   const numberRows = Math.floor(height / cellArea);
   const numberColumns = Math.floor(width / cellArea);
-  const [cells, setCells] = React.useState(_ => generateCells(numberRows, numberColumns)); // [{row:1, col:1}, {row:1, col:2}...]
-  const [snake, setSnake] = React.useState([{row:1, col:2}, {row:1, col:1}]);
+  const [cells, setCells] = React.useState(() => generateCells(numberRows, numberColumns)); // [{row:1, col:1}, {row:1, col:2}...]
+  const [snake, setSnake] = React.useState([{row:getRandomInt(1, numberRows), col:getRandomInt(1, numberColumns)}]);
 
   const getRandomCellWithoutSnake = () => {
     const allowedCells = cells.filter(cell => !snake.find( snakeCell => cell.row === snakeCell.row && cell.col === snakeCell.col));
@@ -35,15 +35,17 @@ function Field({width, height, cellArea}) {
   const [direction, setDirection] = React.useState(DIRECTION.RIGHT);
   const [food, setFood] = React.useState(getRandomCellWithoutSnake);
   const [step, setStep] = React.useState(0);
+  const [accelerationMode, setAccelerationMode] = React.useState(false);
 
   const refDirection = React.useRef(direction);
   refDirection.current = direction;
 
-  const refInterval = React.useRef({id:null, speed:220});
+  const refInterval = React.useRef({id:null, speed: defaultSpeed});
+  refInterval.current.speed = accelerationMode ? fastSpeed : defaultSpeed;
 
   const onKeyDown = (evt) => {
-    const controlButtonPressed = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].some(key => key === evt.code);
-    console.log(evt.code)
+    const controlButtonPressed = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "ControlLeft"].some(key => key === evt.code);
+
     if (controlButtonPressed) {
       evt.preventDefault();
 
@@ -55,8 +57,16 @@ function Field({width, height, cellArea}) {
         setDirection(DIRECTION.UP)
       } else if (evt.code === "ArrowDown" && refDirection.current !== DIRECTION.UP) {
         setDirection(DIRECTION.DOWN)
+      } else if (evt.code === "ControlLeft") {
+        setAccelerationMode(true);
       }
+    }
+  }
 
+  const onKeyUp = (evt) => {
+    if (evt.code === "ControlLeft") {
+      evt.preventDefault();
+      setAccelerationMode(false);
     }
   }
 
@@ -99,16 +109,20 @@ function Field({width, height, cellArea}) {
   }
 
   React.useEffect(() => {
-
     window.addEventListener("keydown", onKeyDown);
-    refInterval.current.id = setInterval(snakeStep, refInterval.current.speed);
+    window.addEventListener("keyup", onKeyUp);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      gameOver();
+      window.removeEventListener("keyup", onKeyUp);
     }
 
   }, [])
+
+  React.useEffect(() => {
+    refInterval.current.id = setInterval(snakeStep, refInterval.current.speed);
+    return () => clearInterval(refInterval.current.id)
+  }, [accelerationMode])
 
 
   React.useEffect(() => {
@@ -126,8 +140,11 @@ function Field({width, height, cellArea}) {
     }
 
     if (snakeAteFood) {
-      setSnake(snake => [...snake, {row:snakeHead.row, col:snakeHead.col}])
+      setSnake(snake => [...snake, {}]) //row:snakeHead.row, col:snakeHead.col
       setFood(getRandomCellWithoutSnake());
+      if (onFoodEat) {
+        onFoodEat();
+      }
     }
 
     if (snakeIsOutColumns || snakeIsOutRows) {
@@ -149,7 +166,7 @@ function Field({width, height, cellArea}) {
   }, [step])
 
   return (
-      cells.length > 0 &&
+      !!cells.length &&
       <div className="field" style={{width: width + "px", height: height + "px"}}>
         {
           cells.map(cell => (
