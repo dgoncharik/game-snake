@@ -4,7 +4,14 @@ import classNames from "classnames";
 import getRandomInt from "../utils/getRandomInt";
 import foods from "../assets/img/food";
 
-function Cell({area, isFood, snakeHead, snake, snakeEnd}) {
+const DIRECTION = {
+  RIGHT: "RIGHT",
+  UP: "UP",
+  LEFT: "LEFT",
+  DOWN: "DOWN",
+}
+
+function Cell({area, isFood, snakeHead, snake, direction}) {
   const [foodImg, setFoodImg] = React.useState(null);
 
   React.useEffect(() => {
@@ -17,11 +24,25 @@ function Cell({area, isFood, snakeHead, snake, snakeEnd}) {
           className={classNames("cell", {
             "snakeHead": snakeHead,
             "snake": snake,
-            "snakeEnd": snakeEnd,
-            "food": isFood
+            "food": isFood,
+            "up": snakeHead && direction === DIRECTION.UP,
+            "down": snakeHead && direction === DIRECTION.DOWN,
+            "left": snakeHead && direction === DIRECTION.LEFT,
+            "right": snakeHead && direction === DIRECTION.RIGHT,
           })}
       >
         {isFood && <img src={foodImg}/>}
+
+        {
+          snakeHead && (
+              <>
+                <div className="snakeEye"/>
+                <div className="snakeEye"/>
+                <div className= "snakeMouth"/>
+              </>
+          )
+
+        }
       </div>
   )
 }

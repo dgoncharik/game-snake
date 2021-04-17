@@ -1,21 +1,26 @@
 .App {
-    width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+}
+
+.scoreboard {
+    height: 100px;
+    background-color: blue;
 }
 
 .field {
     display: flex;
     flex-wrap: wrap;
     flex-shrink: 0;
-    //border: 10px solid black;
     border-radius: 10px;
     background-size: cover;
     background: linear-gradient(45deg, rgb(15, 71, 58), rgb(140, 197, 160), rgb(20, 184, 61));
     box-shadow: 5px 5px 29px 3px rgba(34, 60, 80, 0.6);
     user-select: none;
+
 
     .cell {
         //box-shadow: 0 0 0 1px rgba(0, 0, 0, .2);
@@ -29,16 +34,61 @@
         }
 
         &.snake {
-            background-color: darkorchid;
+            background-color: transparentize(gray, .8);
+            border-radius: 35%;
+            box-shadow: 0 0 10px 0 rgba(34, 60, 80, 0.2), 0 0 15px 0 rgba(0, 0, 0, 0.39) inset;
         }
 
-        &.snakeEnd {
-            background-color: black;
-        }
+
 
         &.snakeHead {
-            background-color: darkred;
-            border-radius: 5px;
+            border-radius: 45%;
+            position: relative;
+
+            &.up {
+                transform: rotate(180deg);
+            }
+
+            &.down {
+                transform: rotate(0deg);
+            }
+
+            &.right {
+                transform: rotate(-90deg);
+            }
+
+            &.left {
+                transform: rotate(90deg);
+            }
+
+            .snakeEye{
+                width: 25%;
+                height: 25%;
+                position: absolute;
+                background-color: white;
+                border-radius: 50%;
+                top: 50%;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    height: 50%;
+                    width: 50%;
+                    background-color: black;
+                    border-radius: 50%;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                }
+
+                &:nth-child(1) {
+                    left: 18%;
+                }
+
+                &:nth-child(2) {
+                    right: 18%;
+                }
+            }
         }
 
     }

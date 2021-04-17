@@ -171,17 +171,16 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
       !!cells.length &&
       <div className="field" style={{width: width + "px", height: height + "px"}}>
         {
-          cells.map(cell => (
-              <Cell
-                  key={`${cell.row}_${cell.col}`}
-                  row={cell.row}
-                  col={cell.col}
-                  area={cellArea}
-                  isFood={cell.row === food.row && cell.col === food.col}
-                  snake={snake.find(tail => cell.row === tail.row && cell.col === tail.col)}
-                  snakeEnd={snake[snake.length-1].row === cell.row && snake[snake.length-1].col === cell.col}
-                  snakeHead={snake[0].row === cell.row && snake[0].col === cell.col}
-              />
+          cells.map(cell => (<Cell
+                key={`${cell.row}_${cell.col}`}
+                row={cell.row}
+                col={cell.col}
+                area={cellArea}
+                isFood={cell.row === food.row && cell.col === food.col}
+                snake={snake.find(tail => cell.row === tail.row && cell.col === tail.col)}
+                snakeHead={snake[0].row === cell.row && snake[0].col === cell.col}
+                direction={refDirection.current}
+            />
           ))
         }
       </div>
