@@ -15,6 +15,11 @@ function App() {
 
   return (
     <div className="App">
+
+      <div className="">
+
+      </div>
+
       <Field width={FIELD_WIDTH} height={FIELD_HEIGHT} cellArea={CELL_AREA} onFoodEat={iter} defaultSpeed={500} fastSpeed={70}/>
     </div>
   );

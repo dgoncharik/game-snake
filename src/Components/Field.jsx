@@ -2,6 +2,7 @@ import React from "react";
 import Cell from "./Cell";
 import getRandomInt from "../utils/getRandomInt";
 
+
 const DIRECTION = {
   RIGHT: "RIGHT",
   UP: "UP",
@@ -25,7 +26,7 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
   const numberRows = Math.floor(height / cellArea);
   const numberColumns = Math.floor(width / cellArea);
   const [cells, setCells] = React.useState(() => generateCells(numberRows, numberColumns)); // [{row:1, col:1}, {row:1, col:2}...]
-  const [snake, setSnake] = React.useState([{row:getRandomInt(1, numberRows), col:getRandomInt(1, numberColumns)}]);
+  const [snake, setSnake] = React.useState([{row:getRandomInt(1, numberRows), col:getRandomInt(1, numberColumns)}, {}]);
 
   const getRandomCellWithoutSnake = () => {
     const allowedCells = cells.filter(cell => !snake.find( snakeCell => cell.row === snakeCell.row && cell.col === snakeCell.col));
@@ -69,6 +70,7 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
       setAccelerationMode(false);
     }
   }
+
 
   const snakeStep = () => {
     setSnake(snake => {
@@ -177,6 +179,7 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
                   area={cellArea}
                   isFood={cell.row === food.row && cell.col === food.col}
                   snake={snake.find(tail => cell.row === tail.row && cell.col === tail.col)}
+                  snakeEnd={snake[snake.length-1].row === cell.row && snake[snake.length-1].col === cell.col}
                   snakeHead={snake[0].row === cell.row && snake[0].col === cell.col}
               />
           ))
