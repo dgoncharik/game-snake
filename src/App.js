@@ -19,7 +19,11 @@ function App() {
     <div className="App">
       <div className="container" style={{width: fieldWidth}}>
         <Switch>
+<<<<<<< HEAD
           {/*<Redirect exact from="/" to="/menu" />*/}
+=======
+          <Redirect exact from="/" to="/menu" />
+>>>>>>> 3218961d5b4ab202c8b9f0aa30dedddf4b37a490
           <Route path="/menu" component={Menu}/>
           <Route path="/run" component={Game}/>
           <Route path="/settings" component={Settings}/>
