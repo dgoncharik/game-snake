@@ -20,10 +20,10 @@ function App() {
       <div className="container" style={{width: fieldWidth}}>
         <Switch>
           <Redirect exact from="/" to="/menu" />
-          <Redirect exact from="/game-snake" to="/menu" />
           <Route path="/menu" component={Menu}/>
           <Route path="/run" component={Game}/>
           <Route path="/settings" component={Settings}/>
+          <Redirect from="*" to="/menu" />
         </Switch>
 
       </div>
