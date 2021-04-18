@@ -1,29 +1,32 @@
 import React from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.scss';
-import Field from "./Components/Field";
-
-const FIELD_WIDTH = 700;
-const FIELD_HEIGHT = 700;
-const CELL_AREA  = 50;
+import Game from "./Components/Game";
+import {useSelector} from "react-redux";
+import {Redirect, Route, Switch} from "react-router-dom";
+import Menu from "./Components/Menu";
+import Settings from "./Components/Settings";
 
 function App() {
-  const [scores, setScores] = React.useState(0);
 
-  const iter = () => {
-    setScores(scores => scores+1)
-  }
+  const {fieldWidth} = useSelector(({game, settings}) => {
+    return {
+      fieldWidth: settings.fieldWidth
+    }
+  })
 
   return (
     <div className="App">
+      <div className="container" style={{width: fieldWidth}}>
+        <Switch>
+          <Redirect exact from="/" to="/menu" />
+          <Redirect exact from="/game-snake" to="/menu" />
+          <Route path="/menu" component={Menu}/>
+          <Route path="/run" component={Game}/>
+          <Route path="/settings" component={Settings}/>
+        </Switch>
 
-      {/*<div className="scoreboard" style={{width: FIELD_WIDTH}}>*/}
-
-      {/*</div>*/}
-
-      <div className="container">
-        <Field width={FIELD_WIDTH} height={FIELD_HEIGHT} cellArea={CELL_AREA} onFoodEat={iter} defaultSpeed={500} fastSpeed={70}/>
       </div>
-
     </div>
   );
 }

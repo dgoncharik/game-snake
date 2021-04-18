@@ -1,15 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
+import {DIRECTION} from "../constants"
 import getRandomInt from "../utils/getRandomInt";
 import foods from "../assets/img/food";
-
-const DIRECTION = {
-  RIGHT: "RIGHT",
-  UP: "UP",
-  LEFT: "LEFT",
-  DOWN: "DOWN",
-}
 
 function Cell({area, isFood, snakeHead, snake, direction}) {
   const [foodImg, setFoodImg] = React.useState(null);
@@ -38,10 +32,8 @@ function Cell({area, isFood, snakeHead, snake, direction}) {
               <>
                 <div className="snakeEye"/>
                 <div className="snakeEye"/>
-                <div className= "snakeMouth"/>
               </>
           )
-
         }
       </div>
   )

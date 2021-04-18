@@ -1,14 +1,8 @@
 import React from "react";
 import Cell from "./Cell";
 import getRandomInt from "../utils/getRandomInt";
-
-
-const DIRECTION = {
-  RIGHT: "RIGHT",
-  UP: "UP",
-  LEFT: "LEFT",
-  DOWN: "DOWN",
-}
+import classNames from "classnames";
+import {DIRECTION} from "../constants"
 
 const generateCells = ((numberRows, numberColumns) => {
   const cells = [];
@@ -22,7 +16,7 @@ const generateCells = ((numberRows, numberColumns) => {
 })
 
 
-function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
+function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed, onGameOver}) {
   const numberRows = Math.floor(height / cellArea);
   const numberColumns = Math.floor(width / cellArea);
   const [cells, setCells] = React.useState(() => generateCells(numberRows, numberColumns)); // [{row:1, col:1}, {row:1, col:2}...]
@@ -35,8 +29,8 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
 
   const [direction, setDirection] = React.useState(DIRECTION.RIGHT);
   const [food, setFood] = React.useState(getRandomCellWithoutSnake);
-  const [step, setStep] = React.useState(0);
   const [accelerationMode, setAccelerationMode] = React.useState(false);
+  const [isLosing, setIsLosing] = React.useState(false);
 
   const refDirection = React.useRef(direction);
   refDirection.current = direction;
@@ -71,6 +65,12 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
     }
   }
 
+  const gameOver = () => {
+    setIsLosing(true);
+    if (onGameOver) {
+      onGameOver();
+    }
+  }
 
   const snakeStep = () => {
     setSnake(snake => {
@@ -102,47 +102,43 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
 
       return newSnake;
     })
-
-    setStep(step => step+1);
-  }
-
-  const gameOver = () => {
-    clearInterval(refInterval.current.id);
   }
 
   React.useEffect(() => {
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
+    if (!isLosing) {
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+    }
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     }
 
-  }, [])
+  }, [isLosing])
 
   React.useEffect(() => {
-    refInterval.current.id = setInterval(snakeStep, refInterval.current.speed);
+    if (!isLosing) {
+      refInterval.current.id = setInterval(snakeStep, refInterval.current.speed);
+    }
     return () => clearInterval(refInterval.current.id)
-  }, [accelerationMode])
+  }, [accelerationMode, isLosing])
 
 
   React.useEffect(() => {
-
-    const snakeHead = snake[0];
-    const snakeTail = snake.slice(1);
-    const tailCollision = snakeTail.some(el => el.row === snakeHead.row && el.col === snakeHead.col);
-    const snakeAteFood = snakeHead.row === food.row && snakeHead.col === food.col;
+    const snakeHead         = snake[0];
+    const snakeTail         = snake.slice(1);
+    const tailCollision     = snakeTail.some(el => el.row === snakeHead.row && el.col === snakeHead.col);
+    const snakeAteFood      = snakeHead.row === food.row && snakeHead.col === food.col;
     const snakeIsOutColumns = snakeHead.col < 1 || snakeHead.col > numberColumns;
     const snakeIsOutRows    = snakeHead.row < 1 || snakeHead.row > numberRows;
 
     if (tailCollision) {
       gameOver();
-      alert("Столкновение с хвостом");
     }
 
     if (snakeAteFood) {
-      setSnake(snake => [...snake, {}]) //row:snakeHead.row, col:snakeHead.col
+      setSnake([...snake, {}]) //row:snakeHead.row, col:snakeHead.col
       setFood(getRandomCellWithoutSnake());
       if (onFoodEat) {
         onFoodEat();
@@ -162,14 +158,13 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
 
         return newSnake;
       })
-      setStep(step => step+1);
     }
 
-  }, [step])
+  }, [snake])
 
   return (
       !!cells.length &&
-      <div className="field" style={{width: width + "px", height: height + "px"}}>
+      <div className={classNames("field", {isLosing: isLosing})} style={{width: width + "px", height: height + "px"}}>
         {
           cells.map(cell => (<Cell
                 key={`${cell.row}_${cell.col}`}
@@ -184,7 +179,6 @@ function Field({width, height, cellArea, onFoodEat, defaultSpeed, fastSpeed}) {
           ))
         }
       </div>
-
   )
 }
 
